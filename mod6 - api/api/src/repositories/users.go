@@ -3,6 +3,7 @@ package repositories
 import (
 	"api/src/models"
 	"database/sql"
+	"errors"
 	"fmt"
 )
 
@@ -40,7 +41,7 @@ func (repository users) Search(nameOrNick string) ([]models.User, error) {
 	nameOrNick = fmt.Sprintf("%%%s%%", nameOrNick)
 
 	lines, err := repository.db.Query(
-		"select id, name, nick, email from users where name ilike ? or nick ilike ?",
+		"select id, name, nick, email from users where name like ? or nick like ?",
 		nameOrNick, nameOrNick,
 	)
 	if err != nil {
@@ -66,4 +67,29 @@ func (repository users) Search(nameOrNick string) ([]models.User, error) {
 	}
 
 	return users, nil
+}
+
+func (repository users) RetrieveUser(ID uint64) (models.User, error) {
+	lines, err := repository.db.Query(
+		"select id, name, nick, email from users where id = ?", ID,
+	)
+	if err != nil {
+		return models.User{}, nil
+	}
+
+	var user models.User
+	if lines.Next() {
+		if err = lines.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+		); err != nil {
+			return models.User{}, err
+		}
+	} else {
+		return models.User{}, errors.New("user not found")
+	}
+
+	return user, nil
 }
