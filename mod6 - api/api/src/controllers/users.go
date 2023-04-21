@@ -6,12 +6,12 @@ import (
 	"api/src/repositories"
 	"api/src/responses"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
-	reqBody, err := ioutil.ReadAll(r.Body)
+	reqBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		responses.Error(w, http.StatusUnprocessableEntity, err)
 		return
