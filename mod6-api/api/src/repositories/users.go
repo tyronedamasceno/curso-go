@@ -144,3 +144,18 @@ func (repository users) Delete(ID uint64) error {
 
 	return nil
 }
+
+func (repository users) Follow(followerId, followedId uint64) error {
+	statement, err := repository.db.Prepare(
+		"insert into followers (user_id, follower_id) values (?, ?)")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err := statement.Exec(followedId, followerId); err != nil {
+		return err
+	}
+
+	return nil
+}
