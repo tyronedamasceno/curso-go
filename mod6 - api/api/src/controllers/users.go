@@ -86,7 +86,7 @@ func RetrieveUser(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	repository := repositories.NewUsersRepository(db)
-	user, err := repository.RetrieveUser(userId)
+	user, err := repository.RetrieveUserByID(userId)
 	if err != nil {
 		if err.Error() == "user not found" {
 			responses.Error(w, http.StatusNotFound, err)

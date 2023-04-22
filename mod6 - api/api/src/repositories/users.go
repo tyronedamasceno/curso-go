@@ -69,7 +69,7 @@ func (repository users) Search(nameOrNick string) ([]models.User, error) {
 	return users, nil
 }
 
-func (repository users) RetrieveUser(ID uint64) (models.User, error) {
+func (repository users) RetrieveUserByID(ID uint64) (models.User, error) {
 	lines, err := repository.db.Query(
 		"select id, name, nick, email from users where id = ?", ID,
 	)
@@ -89,6 +89,27 @@ func (repository users) RetrieveUser(ID uint64) (models.User, error) {
 		}
 	} else {
 		return models.User{}, errors.New("user not found")
+	}
+
+	return user, nil
+}
+
+func (repository users) RetrieveUserByEmail(email string) (models.User, error) {
+	lines, err := repository.db.Query(
+		"select id, password from users where email = ?", email,
+	)
+	if err != nil {
+		return models.User{}, nil
+	}
+
+	var user models.User
+	if lines.Next() {
+		if err = lines.Scan(
+			&user.ID,
+			&user.Password,
+		); err != nil {
+			return models.User{}, err
+		}
 	}
 
 	return user, nil
