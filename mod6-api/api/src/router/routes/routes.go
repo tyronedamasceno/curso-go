@@ -20,6 +20,7 @@ func SetUp(r *mux.Router) *mux.Router {
 	routes = append(routes, loginRoute)
 
 	for _, route := range routes {
+		route.Function = middlewares.Logger(route.Function)
 		if route.RequiresAuth {
 			r.HandleFunc(route.URI, middlewares.Authenticate(route.Function)).Methods(route.Method)
 		} else {
