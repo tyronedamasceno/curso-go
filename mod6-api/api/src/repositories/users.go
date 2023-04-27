@@ -115,6 +115,27 @@ func (repository users) RetrieveUserByEmail(email string) (models.User, error) {
 	return user, nil
 }
 
+func (repository users) RetrieveUserPasswordById(userId uint64) (string, error) {
+	lines, err := repository.db.Query(
+		"select id, password from users where id = ?", userId,
+	)
+	if err != nil {
+		return "", nil
+	}
+
+	var user models.User
+	if lines.Next() {
+		if err = lines.Scan(
+			&user.ID,
+			&user.Password,
+		); err != nil {
+			return "", err
+		}
+	}
+
+	return user.Password, nil
+}
+
 func (repository users) Update(ID uint64, user models.User) error {
 	statement, err := repository.db.Prepare(
 		"update users set name = ?, nick = ?, email = ? where id = ?",
@@ -237,4 +258,20 @@ func (repository users) SearchFollowing(userId uint64) ([]models.User, error) {
 	}
 
 	return followers, nil
+}
+
+func (repository users) UpdateUserPassword(userId uint64, newPwd string) error {
+	statement, err := repository.db.Prepare(
+		"update users set password = ? where id = ?",
+	)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(newPwd, userId); err != nil {
+		return err
+	}
+
+	return nil
 }
