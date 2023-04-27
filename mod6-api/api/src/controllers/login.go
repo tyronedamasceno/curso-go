@@ -51,5 +51,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responses.JSON(w, http.StatusOK, token)
+	responses.JSON(w, http.StatusOK, struct {
+		Token string `json:"token"`
+	}{
+		Token: token,
+	})
 }
