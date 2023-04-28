@@ -1,6 +1,7 @@
 CREATE DATABASE IF NOT EXISTS db;
 USE db;
 
+DROP TABLE IF EXISTS posts;
 DROP TABLE IF EXISTS followers;
 DROP TABLE IF EXISTS users;
 
@@ -25,4 +26,17 @@ CREATE TABLE followers(
     on delete cascade,
 
     primary key(user_id, follower_id)
+) ENGINE=INNODB;
+
+CREATE TABLE posts(
+    id int auto_increment primary key,
+    title varchar(50) not null,
+    content varchar(300) not null,
+
+    author_id int not null,
+    foreign key (author_id)
+    references users(id)
+    on delete cascade,
+
+    likes int default 0
 ) ENGINE=INNODB;
